@@ -1,47 +1,43 @@
 import sys
-sys.setrecursionlimit(2000)
+sys.setrecursionlimit(1000000)
 
 ##initializing variables
 
 h = 100 ## W/m²
 Tf = 50 ## °C
-numberPoints = 5
+numberPoints = 100
 d = 0.2 ## m 
 k = 237 ## W/m°C
 Ac = 1
 Deltax = d/(numberPoints - 1)
-Aconv = Deltax ## m²
+Aconv = Ac ## m²
 Tinf = 20 ## °C
-resudue = 0.001
+resudue = 0.0000001
 
 ##Visualization variables
 counter = 0
-decimalPlaces = 4
-
+decimalPlaces = 2
 
 ##Volumes on the left - coefficients
-Ap_l = ((3 * k * Ac) / Deltax) + h * Aconv
+Ap_l = ((3 * k * Ac) / Deltax) 
 Ae_l = k * Ac / Deltax
-B_l = (((2 * k * Ac) / Deltax) * Tf) + (h * Aconv * Tinf)
+B_l = ((2 * k * Ac) / Deltax) * Tf
 
 
 ##Volumes on the center - coefficients
-Ap_c = ((2 * k * Ac) / Deltax) + h * Aconv
+Ap_c = ((2 * k * Ac) / Deltax)
 Ae_c = k * Ac / Deltax
 Aw_c = k * Ac / Deltax
-B_c = h * Aconv * Tinf
 
-##Volume on the right - coefficients
+##Volume on the right - coefficientsFB-c
 Ap_r = ((k * Ac) / Deltax) + h * Aconv
 Aw_r = k * Ac / Deltax
 B_r = h * Aconv * Tinf
 
-def setList(numberPoints, Tf, Tinf):
+def setList(numberPoints, Tinf):
   firstList = []
-  firstList.append(Tf)
-  for i in range(1,numberPoints):
+  for i in range(numberPoints):
     firstList.append(Tinf)
-  print(firstList)
   return firstList
 
 def nextStep(t0):
@@ -49,10 +45,10 @@ def nextStep(t0):
   length = len(t0)
 
   t1 = t0.copy()
-  t1[0] = t0[0]
+  t1[0] = (t0[1] * Ae_l + B_l) / Ap_l
 
   for i in range(1, length - 1):
-    t1[i] = (Ae_c * t0[i + 1] + (Aw_c * t0[i - 1]) + B_c) / Ap_c
+    t1[i] = (Ae_c * t0[i + 1] + (Aw_c * t0[i - 1])) / Ap_c
 
   t1[length - 1] = (Aw_r * t0[length - 2] + B_r) / Ap_r
 
@@ -65,10 +61,10 @@ def nextStep(t0):
     nextStep(t1)
 
   else:
-    print(counter)
+    print('O número de iterações foi de {counter}'.format(counter = counter))
 
 def main():
-  t0 = setList(numberPoints, Tf, Tinf)
+  t0 = setList(numberPoints, Tinf)
   nextStep(t0)
 
 def residue(list1, list2, residue):
