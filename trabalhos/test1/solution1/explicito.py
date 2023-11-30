@@ -5,7 +5,7 @@ sys.setrecursionlimit(1000000)
 
 h = 100 ## W/m²
 Tf = 50 ## °C
-numberPoints = 100
+numberPoints = 5
 d = 0.2 ## m 
 k = 237 ## W/m°C
 Ac = 1
