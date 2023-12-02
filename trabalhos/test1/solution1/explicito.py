@@ -41,7 +41,7 @@ def setList(numberPoints, Tinf):
   return firstList
 
 def nextStep(t0):
-
+  global counter
   length = len(t0)
 
   t1 = t0.copy()
@@ -54,7 +54,7 @@ def nextStep(t0):
 
   if(residue(t0, t1, resudue)):
 
-    global counter
+    
     counter += 1
 
     print(setdecimalPlaces(t1, decimalPlaces))
