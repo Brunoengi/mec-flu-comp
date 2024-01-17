@@ -1,5 +1,6 @@
-import copy ##Cópia profunda vs Cópia Superficial
+import copy ##deep copy vs shallow copy
 import math
+from operator import itemgetter
 
 ##Inputs
 gama = 1
@@ -9,9 +10,9 @@ ro = 1
 length = 1
 
 ##Mesh
-lineVolums = 30
+lineVolums = 3
 inicialValue = 0
-deltax = length / (lineVolums - 1)
+deltax = length / (lineVolums)
 
 ##Border Variables
 northBorder = 1
@@ -23,6 +24,7 @@ southBorder = 0
 counter = 0
 
 #Data Loop
+method = 'a'
 resid = 0.00001
 decimalPrecision = 2
 
@@ -43,7 +45,7 @@ def insertNone(mesh):
   mesh[len(mesh) - 1][len(mesh) - 1] = None
   return mesh
 
-def calculatet1(mesh):
+def calculatet1(mesh, method):
   global counter
   l = len(mesh)
   
@@ -61,19 +63,27 @@ def calculatet1(mesh):
     mesh[i][l - 1] = - mesh0[i][l - 2] + 2 * eastBorder
     
   #centralVolums
+    Aw, Ae, An, As, Ap = itemgetter('Aw','Ae', 'An', 'As', 'Ap')(getCoefficient(method))
+
   for i in range(1, l - 1):
     for j in range(1, l - 1):
-    
+
+      OW = mesh0[i][j-1]
+      OE = mesh0[i][j + 1]
+      ON = mesh0[i - 1][j]
+      OS = mesh0[i + 1][j]
+      
       ## Aw * OW
-      W = ((ro * u * deltax/2) + gama) * mesh0[i][j-1]
+      W = Aw * OW
       ## Ae * OE
-      E = ((-ro * u * deltax/2) + gama) * mesh0[i][j + 1]
+      E = Ae * OE
       ## An * ON
-      N = ((-ro * v * deltax/2) + gama) * mesh0[i - 1][j]
+      N = An * ON
       ## As * OS
-      S = ((ro * v * deltax/2) + gama) * mesh0[i + 1][j]
-            
-      mesh[i][j] = (W + E + N + S) / (4 * gama)
+      S = As * OS
+
+      ##OP
+      mesh[i][j] = (W + E + N + S) / Ap
 
   if(counter < 500):
     ##residue(mesh0, mesh, resid)
@@ -81,7 +91,7 @@ def calculatet1(mesh):
       centralLine = math.floor(len(mesh)/2)
       print(mesh[centralLine])
     counter += 1
-    calculatet1(mesh)
+    calculatet1(mesh, method)
 
   # else:
   #   print('O número de iterações foi de {counter}'.format(counter = counter))
@@ -104,9 +114,36 @@ def residue(matrix1, matrix2, resid):
 
   return response
 
+def getCoefficient(method):
+  
+  if(method == 'CDS' or method == 'a'):
+      
+    Ap = 4 * gama 
+    Ae = ((-ro * u * deltax/2) + gama) 
+    Aw = ((ro * u * deltax/2) + gama) 
+    An = ((-ro * v * deltax/2) + gama) 
+    As = ((ro * v * deltax/2) + gama)
+    
+  elif(method == 'Upwind' or method == 'b'):
+    
+    Ap = (2 * ro * u * deltax) + (4 * gama)
+    Ae = gama
+    Aw = (ro * u * deltax) + gama
+    An = gama
+    As = (ro * u * deltax) + gama
+  
+  return {
+    'Ap': Ap,
+    'Aw': Aw,
+    'Ae': Ae,
+    'An': An,
+    'As': As
+  }
+
 def main():
   mesh = createMesh(lineVolums, inicialValue)
   meshWithNone = insertNone(mesh)
-  calculatet1(meshWithNone)
+  calculatet1(meshWithNone, method)
 
 main()
+

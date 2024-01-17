@@ -2,21 +2,20 @@ import sys
 sys.setrecursionlimit(1000000)
 
 ##initializing variables
-
 h = 100 ## W/m²
 Tf = 50 ## °C
-numberPoints = 5
+numberPoints = 128
 d = 0.2 ## m 
 k = 237 ## W/m°C
 Ac = 1
-Deltax = d/(numberPoints - 1)
+Deltax = d/(numberPoints)
 Aconv = Ac ## m²
 Tinf = 20 ## °C
-resudue = 0.0000001
+resudue = 0.00000001
 
 ##Visualization variables
 counter = 0
-decimalPlaces = 2
+decimalPlaces = 3
 
 ##Volumes on the left - coefficients
 Ap_l = ((3 * k * Ac) / Deltax) 
